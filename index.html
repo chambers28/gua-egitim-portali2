@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUA Eğitim Portalı - Gıda Üretim Akademisi</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <div class="logo-main">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>GUA Eğitim Portalı</h1>
+                <p>Gıda Üretim Akademisi</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+                <input type="password" id="password" placeholder="Şifre" required>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                </button>
+            </form>
+            
+            <div class="demo-accounts">
+                <h4><i class="fas fa-key"></i> Demo Hesaplar</h4>
+                <p>
+                    <span><strong>Admin:</strong> admin / admin123</span>
+                    <span class="role-badge role-admin">TÜM YETKİLER</span>
+                </p>
+                <p>
+                    <span><strong>Yönetici:</strong> yonetici / yonetici123</span>
+                    <span class="role-badge role-admin">TÜM YETKİLER</span>
+                </p>
+                <p>
+                    <span><strong>Kullanıcı:</strong> ahmet / ahmet123</span>
+                    <span class="role-badge role-user">SADECE İZLEME</span>
+                </p>
+                <p>
+                    <span><strong>Kullanıcı:</strong> ayşe / ayşe123</span>
+                    <span class="role-badge role-user">SADECE İZLEME</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="confirmation-title">Emin misiniz?</h3>
+            <p id="confirmation-message">Bu işlem geri alınamaz.</p>
+            <div class="confirmation-buttons">
+                <button id="confirm-cancel" class="btn btn-secondary">İptal</button>
+                <button id="confirm-ok" class="btn btn-danger">Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" style="display: none;">
+        <!-- Header -->
+        <header>
+            <a href="#" class="header-logo" onclick="showPage('home'); return false;">
+                <div class="header-logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="header-logo-text">
+                    <h1>GUA Eğitim Portalı</h1>
+                    <span>Gıda Üretim Akademisi</span>
+                </div>
+            </a>
+            
+            <div class="user-menu">
+                <div class="profile" onclick="showPage('profile')">
+                    <div class="profile-avatar" id="header-avatar">A</div>
+                    <div>
+                        <div id="current-user-name">Admin User</div>
+                        <div id="current-user-role" class="role-badge role-admin">TÜM YETKİLER</div>
+                    </div>
+                </div>
+                <button onclick="logout()" class="logout-btn" title="Çıkış Yap">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#" class="active" onclick="showPage('home')">
+                    <i class="fas fa-home"></i> Ana Sayfa
+                </a></li>
+                <li><a href="#" onclick="showPage('videos')">
+                    <i class="fas fa-play-circle"></i> Videolar
+                </a></li>
+                <li id="admin-nav"><a href="#" onclick="showPage('admin')">
+                    <i class="fas fa-cog"></i> Yönetici Paneli
+                </a></li>
+                <li><a href="#" onclick="showPage('profile')">
+                    <i class="fas fa-user"></i> Profilim
+                </a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-layer-group"></i> Kategoriler</h3>
+                    <ul class="category-list" id="category-list">
+                        <!-- Categories will be loaded here -->
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <h3><i class="fas fa-chart-line"></i> İlerleme</h3>
+                            <span id="progress-percentage">%0</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress-bar-fill"></div>
+                        </div>
+                        <p>Tamamlanan: <span id="completed-videos">0</span>/<span id="total-videos">0</span> video</p>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-crown"></i> Admin Yetkileri</h3>
+                    <div class="admin-permissions">
+                        <p><i class="fas fa-check-circle"></i> Video yükleme</p>
+                        <p><i class="fas fa-check-circle"></i> Video silme</p>
+                        <p><i class="fas fa-check-circle"></i> Kullanıcı yönetimi</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Home Page -->
+                <div id="home-page">
+                    <div class="welcome-banner">
+                        <div class="welcome-content">
+                            <h2 id="welcome-message">Hoş Geldiniz, Admin!</h2>
+                            <p>GUA Yönetici Paneli'ne hoş geldiniz. Tüm yetkilerinizle sistemi yönetebilirsiniz.</p>
+                            <div class="stats-badges">
+                                <div class="stat-badge">
+                                    <i class="fas fa-video"></i>
+                                    <span><strong id="home-total-videos">0</strong> Video</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <i class="fas fa-users"></i>
+                                    <span><strong id="home-total-users">0</strong> Kullanıcı</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <i class="fas fa-eye"></i>
+                                    <span><strong id="home-total-views">0</strong> İzlenme</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="page-header">
+                        <h2><i class="fas fa-fire"></i> Son Eklenen Videolar</h2>
+                        <div>
+                            <button class="btn btn-primary" onclick="showPage('videos')">
+                                <i class="fas fa-play-circle"></i> Tümünü Gör
+                            </button>
+                            <button class="btn btn-success" onclick="showModal('upload-video')" style="margin-left: 0.5rem;">
+                                <i class="fas fa-upload"></i> Yeni Video Ekle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="video-grid" id="home-video-grid">
+                        <!-- Videos will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Videos Page -->
+                <div id="videos-page" style="display: none;">
+                    <div class="page-header">
+                        <h2><i class="fas fa-play-circle"></i> Tüm Eğitim Videoları</h2>
+                        <div>
+                            <button class="btn btn-success" onclick="showModal('upload-video')">
+                                <i class="fas fa-upload"></i> Yeni Video Ekle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="video-grid" id="all-videos-grid">
+                        <!-- All videos will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Admin Panel -->
+                <div id="admin-page" style="display: none;">
+                    <div class="page-header">
+                        <h2><i class="fas fa-crown"></i> Tam Yetkili Yönetici Paneli</h2>
+                        <div>
+                            <button class="btn btn-primary" onclick="showModal('add-user')">
+                                <i class="fas fa-user-plus"></i> Kullanıcı Ekle
+                            </button>
+                            <button class="btn btn-success" onclick="showModal('upload-video')" style="margin-left: 0.5rem;">
+                                <i class="fas fa-upload"></i> Video Ekle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Stats -->
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-users">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-users">0</h3>
+                                <p>Toplam Kullanıcı</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-videos">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-videos">0</h3>
+                                <p>Toplam Video</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-views">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-views">0</h3>
+                                <p>Toplam İzlenme</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-deleted">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-deleted">0</h3>
+                                <p>Silinen Video</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Tabs -->
+                    <div class="admin-tabs">
+                        <button class="tab-btn active" onclick="showAdminTab('users')">
+                            <i class="fas fa-users"></i> Kullanıcı Yönetimi
+                        </button>
+                        <button class="tab-btn" onclick="showAdminTab('videos')">
+                            <i class="fas fa-video"></i> Video Yönetimi
+                        </button>
+                        <button class="tab-btn" onclick="showAdminTab('categories')">
+                            <i class="fas fa-folder"></i> Kategori Yönetimi
+                        </button>
+                        <button class="tab-btn" onclick="showAdminTab('logs')">
+                            <i class="fas fa-history"></i> Sistem Logları
+                        </button>
+                    </div>
+                    
+                    <!-- Users Tab -->
+                    <div id="users-tab" class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Departman</th>
+                                    <th>Rol</th>
+                                    <th>Son Giriş</th>
+                                    <th>İlerleme</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Videos Tab -->
+                    <div id="videos-tab" class="table-container" style="display: none;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Video</th>
+                                    <th>Kategori</th>
+                                    <th>Süre</th>
+                                    <th>İzlenme</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-videos-table">
+                                <!-- Videos will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Categories Tab -->
+                    <div id="categories-tab" style="display: none;">
+                        <div class="categories-header">
+                            <h3>Kategori Yönetimi</h3>
+                            <button class="btn btn-primary" onclick="showModal('add-category')">
+                                <i class="fas fa-plus"></i> Yeni Kategori
+                            </button>
+                        </div>
+                        <div class="video-grid" id="categories-grid">
+                            <!-- Categories will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Logs Tab -->
+                    <div id="logs-tab" style="display: none;">
+                        <div class="logs-container">
+                            <h3><i class="fas fa-history"></i> Sistem Logları</h3>
+                            <div id="system-logs">
+                                <!-- Logs will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Page -->
+                <div id="profile-page" style="display: none;">
+                    <div class="page-header">
+                        <h2><i class="fas fa-user-shield"></i> Yönetici Profili</h2>
+                        <button class="btn btn-primary" onclick="showModal('edit-profile')">
+                            <i class="fas fa-edit"></i> Profili Düzenle
+                        </button>
+                    </div>
+                    
+                    <div class="profile-container">
+                        <div class="profile-card">
+                            <div class="profile-avatar-large" id="profile-avatar">A</div>
+                            <h2 id="profile-name">Admin User</h2>
+                            <p id="profile-department">Yönetim</p>
+                            <div class="admin-badge">
+                                <i class="fas fa-crown"></i> TAM YETKİLİ YÖNETİCİ
+                            </div>
+                            <p id="profile-email">admin@guaportal.com</p>
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <h3><i class="fas fa-chart-line"></i> Yönetici İstatistikleri</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div id="admin-total-videos">0</div>
+                                    <p>Yüklenen Video</p>
+                                </div>
+                                <div class="stat-item">
+                                    <div id="admin-deleted-videos">0</div>
+                                    <p>Silinen Video</p>
+                                </div>
+                                <div class="stat-item">
+                                    <div id="admin-added-users">0</div>
+                                    <p>Eklenen Kullanıcı</p>
+                                </div>
+                                <div class="stat-item">
+                                    <div id="admin-system-logs">0</div>
+                                    <p>Sistem Logu</p>
+                                </div>
+                            </div>
+                            
+                            <h3><i class="fas fa-history"></i> Son Yönetici İşlemleri</h3>
+                            <div id="admin-recent-actions">
+                                <!-- Recent admin actions will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p><strong>GUA Eğitim Portalı</strong> - Gıda Üretim Akademisi</p>
+                <p>© 2023 Tüm hakları saklıdır. Tam yetkili yönetici paneli</p>
+                <div class="footer-stats">
+                    <span id="footer-users">0 Kullanıcı</span>
+                    <span id="footer-videos">0 Video</span>
+                    <span id="footer-deleted">0 Silinen</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Yeni Kullanıcı</h3>
+                <button class="close-modal" onclick="closeModal('add-user')">&times;</button>
+            </div>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label>Kullanıcı Adı *</label>
+                    <input type="text" id="new-username" required>
+                </div>
+                <div class="form-group">
+                    <label>Şifre *</label>
+                    <input type="password" id="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label>Ad Soyad *</label>
+                    <input type="text" id="new-fullname" required>
+                </div>
+                <div class="form-group">
+                    <label>E-posta *</label>
+                    <input type="email" id="new-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Departman *</label>
+                    <select id="new-department" required>
+                        <option value="">Seçiniz</option>
+                        <option value="Üretim">Üretim</option>
+                        <option value="Kalite Kontrol">Kalite Kontrol</option>
+                        <option value="Pazarlama">Pazarlama</option>
+                        <option value="İnsan Kaynakları">İnsan Kaynakları</option>
+                        <option value="Yönetim">Yönetim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rol *</label>
+                    <select id="new-role" required>
+                        <option value="user">Kullanıcı (Sadece İzleme)</option>
+                        <option value="admin">Yönetici (Tam Yetki)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Kullanıcıyı Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Video Modal -->
+    <div id="upload-video-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Video Yükle</h3>
+                <button class="close-modal" onclick="closeModal('upload-video')">&times;</button>
+            </div>
+            <form id="upload-video-form">
+                <div class="form-group">
+                    <label>Video Başlığı *</label>
+                    <input type="text" id="video-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Açıklama *</label>
+                    <textarea id="video-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Kategori *</label>
+                    <select id="video-category" required>
+                        <!-- Categories will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Süre (dakika) *</label>
+                    <input type="number" id="video-duration" required min="1">
+                </div>
+                <div class="form-group">
+                    <label>Video URL</label>
+                    <input type="text" id="video-url" placeholder="https://example.com/video.mp4">
+                    <small>Gerçek sistemde video dosyası yüklenecek</small>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-upload"></i> Video'yu Yükle
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="add-category-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder-plus"></i> Yeni Kategori</h3>
+                <button class="close-modal" onclick="closeModal('add-category')">&times;</button>
+            </div>
+            <form id="add-category-form">
+                <div class="form-group">
+                    <label>Kategori Adı *</label>
+                    <input type="text" id="category-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea id="category-description" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Renk</label>
+                    <input type="color" id="category-color" value="#1a5f7a">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Kategoriyi Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> Profili Düzenle</h3>
+                <button class="close-modal" onclick="closeModal('edit-profile')">&times;</button>
+            </div>
+            <form id="edit-profile-form">
+                <div class="form-group">
+                    <label>Ad Soyad *</label>
+                    <input type="text" id="edit-fullname" required>
+                </div>
+                <div class="form-group">
+                    <label>E-posta *</label>
+                    <input type="email" id="edit-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Departman</label>
+                    <select id="edit-department">
+                        <option value="Üretim">Üretim</option>
+                        <option value="Kalite Kontrol">Kalite Kontrol</option>
+                        <option value="Pazarlama">Pazarlama</option>
+                        <option value="İnsan Kaynakları">İnsan Kaynakları</option>
+                        <option value="Yönetim">Yönetim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Yeni Şifre</label>
+                    <input type="password" id="edit-password" placeholder="Değiştirmek istemiyorsanız boş bırakın">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
