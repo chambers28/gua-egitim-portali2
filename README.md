@@ -1,0 +1,1 @@
+# gua-egitim-portali2
